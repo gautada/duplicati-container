@@ -22,8 +22,8 @@ LABEL description="A backup service and system"
 # │ VERSION            │
 # ╰――――――――――――――――――――╯
 ARG DUPLICITY_VERSION=0.8.23
-ARG DUPLICITY_BRANCH="$DUPLICITY_VERSION"-r0
-RUN /sbin/apk add --no-cache duplicity
+ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
+RUN /sbin/apk add --no-cache duplicity=$DUPLICITY_PACKAGE
 
 # ╭――――――――――――――――――――╮
 # │ USER               │
