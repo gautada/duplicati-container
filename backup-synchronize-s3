@@ -100,6 +100,7 @@ class BackupSynchronize:
             for file in backupstruct['files']:
                 path = "%s/%s" % (folder, file)
                 stats = os.stat(path)
+                print(stats.st_mtime)
                 if last < stats.st_mtime:
                     last = stats.st_mtime
                 # self.__synchronize_file(self.__client, self.__config.bucket, cache, path)
@@ -108,9 +109,10 @@ class BackupSynchronize:
                 if timestamp - start >= self.__config.rtimeout:
                     run_timeout = True
                     break
+            print((timestamp - last), self.__config.ltimeout, self.__config.stimeout)
             if timestamp - last >= self.__config.ltimeout:
                 print("[ERROR]: long timeout hit for %s" % cache)
-            elif timestamp - last >= self._config.stimeout:
+            elif timestamp - last >= self.__config.stimeout:
                 print("[ WARN]: Short timeout hit for %s" % cache)
             # if timesout - <= :
             #     print("[ERROR] Timeout, will need to complete the one-way synch on the next run")
@@ -165,7 +167,7 @@ class BackupSynchronize:
         file_checksum = self.__file_checksum(path)
         if s3_checksum != file_checksum:
             print("[SYNCING] %s %s" % (week, path))
-            self.__client.upload_file(file, self.__config.bucket, resource, Config=self.__transfer_config)
+            self.__client.upload_file(path, self.__config.bucket, resource, Config=self.__transfer_config)
             s3_checksum = self.__s3_checksum(resource)
             assert s3_checksum == file_checksum, "Checksums must be equal(S3=%s|File=%s)" % (s3_checksum, file_checksum)
         else:
