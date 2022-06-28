@@ -23,6 +23,6 @@ steps:
     DOCKERIO_PASSWORD:
       from_secret: password.docker.io
   commands:
-   - podman tag duplicity:build docker.io/gautada/duplicity:$DUPLICITY_VERSION
+   - podman tag duplicity:build  docker.io/gautada/duplicity:$DUPLICITY_VERSION
    - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
    - podman push docker.io/gautada/duplicity:$DUPLICITY_VERSION
