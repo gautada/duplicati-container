@@ -14,7 +14,7 @@ steps:
     ALPINE_VERSION: 3.16.0
     DUPLICITY_VERSION: 0.8.23
   commands:
-  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg GITEA_VERSION=$GITEA_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag gitea:build .
+  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg DUPLICITY_VERSION=$DUPLICITY_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag duplicity:build .
 - name: publish
   environment:
     GITEA_VERSION: 0.8.23
@@ -23,6 +23,6 @@ steps:
     DOCKERIO_PASSWORD:
       from_secret: password.docker.io
   commands:
-   - podman tag gitea:build docker.io/gautada/gitea:$GITEA_VERSION
+   - podman tag duplicity:build docker.io/gautada/duplicity:$DUPLICITY_VERSION
    - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
-   - podman push docker.io/gautada/gitea:$GITEA_VERSION
+   - podman push docker.io/gautada/duplicity:$DUPLICITY_VERSION
