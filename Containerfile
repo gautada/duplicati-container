@@ -36,6 +36,7 @@ ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 # ╰――――――――――――――――――――╯
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
 COPY backup-synchronize-s3 /usr/sbin/backup-synchronize-s3
+RUN ln -s /usr/sbin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
 COPY wheel-synchronize /etc/container/wheel.d/wheel-synchronize
 RUN /bin/mkdir -p /opt/$USER /etc/duplicity /opt/backup
 RUN ln -s /opt/duplicity/decryption.pri /etc/duplicity/decryption.pri \
