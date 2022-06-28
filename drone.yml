@@ -17,7 +17,7 @@ steps:
   - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg DUPLICITY_VERSION=$DUPLICITY_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag duplicity:build .
 - name: publish
   environment:
-    GITEA_VERSION: 0.8.23
+    DUPLICITY_VERSION: 0.8.23
     DOCKERIO_USERNAME:
       from_secret: username.docker.io
     DOCKERIO_PASSWORD:
