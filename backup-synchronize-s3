@@ -89,8 +89,8 @@ class BackupSynchronize:
     # keep a list of the caches that have a problem.
     def synchronize(self):
         backupstructs = self.__structure_backup() # self.__config.folder)
-        start = datetime.datetime.now().timestamp()
-        timestamp = datetime.datetime.now().timestamp()
+        start = datetime.datetime.utcnow().timestamp()
+        timestamp = datetime.datetime.utcnow().timestamp()
         timeout = False
         for backupstruct in backupstructs:
             folder = backupstruct['folder']
@@ -105,7 +105,7 @@ class BackupSynchronize:
                     last = stats.st_mtime
                 # self.__synchronize_file(self.__client, self.__config.bucket, cache, path)
                 self.__synchronize_file(cache, path)
-                timestamp = datetime.datetime.now().timestamp()
+                timestamp = datetime.datetime.utcnow().timestamp()
                 if timestamp - start >= self.__config.rtimeout:
                     run_timeout = True
                     break
@@ -161,7 +161,7 @@ class BackupSynchronize:
     def __synchronize_file(self, cache, path):
         assert path is not None, "File cannot be nil."
         assert os.path.exists(path), "File(%s) must exist." % path
-        week = datetime.datetime.now().strftime("%U")
+        week = datetime.datetime.utcnow().strftime("%U")
         resource = "%s/%s/%s" % (week, cache,  os.path.basename(path))
         s3_checksum = self.__s3_checksum(resource)
         file_checksum = self.__file_checksum(path)

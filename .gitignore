@@ -9,7 +9,7 @@
 **-container/
 
 # Ignore any manifest folders
-**-manifest/
+manifest/
 
 # .dockerignore can simply be a symlink
 .dockerignore

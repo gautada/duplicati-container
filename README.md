@@ -1,11 +1,8 @@
 # duplicity-container
-A duplicati container
 
-https://www.duplicati.com
+[Duplicity](https://duplicity.gitlab.io) backs directories by producing encrypted tar-format volumes and uploading them to a remote or local file server. Because duplicity uses librsync, the incremental archives are space efficient and only record the parts of files that have changed since the last backup. Because duplicity uses GnuPG to encrypt and/or sign these archives, they will be safe from spying and/or modification by the server.
 
-https://github.com/duplicati/duplicati
-
-https://github.com/hydazz/docker-duplicati
+*Note:* This container originally was going to be implemented using [Duplicati](https://www.duplicati.com) that idea was dropped due to the difficulty in implementing mono from source.
 
 ## Restore
 
@@ -41,3 +38,4 @@ duplicity full --encrypt-key <id> --name daily --dry-run /var/backup file:///opt
   
   
   
+
