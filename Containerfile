@@ -32,6 +32,11 @@ ARG DUPLICITY_VERSION=0.8.23
 ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 
 # ╭――――――――――――――――――――╮
+# │ CONFIG             │
+# ╰――――――――――――――――――――╯
+RUN ln -s /etc/container/configmap.d /etc/duplicity
+
+# ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
