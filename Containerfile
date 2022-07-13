@@ -37,6 +37,11 @@ ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 RUN ln -s /etc/container/configmap.d /etc/duplicity
 
 # ╭――――――――――――――――――――╮
+# │ BACKUP             │
+# ╰――――――――――――――――――――╯
+COPY backup.fnc /etc/container/backup.d/backup.fnc
+
+# ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
 COPY 10-ep-container.sh /etc/container/entrypoint.d/10-ep-container.sh
