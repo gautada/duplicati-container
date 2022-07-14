@@ -56,6 +56,9 @@ RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
 RUN /bin/chown $USER:$USER -R /opt/$USER /opt/backup
 RUN pip install --upgrade pip
 
+RUN /bin/mkdir -p /opt/$USER /run/postgresql /var/backup /opt/backup /temp/backup \
+ && /bin/chown -R $USER:$USER /opt/$USER /etc/$USER /run/postgresql /var/backup /tmp/backup /opt/backup
+ 
 USER $USER
 WORKDIR /home/$USER
 VOLUME /opt/$USER
