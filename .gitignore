@@ -6,7 +6,7 @@
 .DS_Store
 
 # Ignore and container runtime folders
-**-container/
+**-volume/
 
 # Ignore any manifest folders
 manifest/

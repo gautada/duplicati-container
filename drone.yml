@@ -11,18 +11,27 @@ platform:
 steps:
 - name: build
   environment:
-    ALPINE_VERSION: 3.16.0
-    DUPLICITY_VERSION: 0.8.23
+    ALPINE_VERSION: "latest"
+    DUPLICITY_VERSION: "1.0.1"
   commands:
-  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg DUPLICITY_VERSION=$DUPLICITY_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag duplicity:build .
+  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg DUPLICITY_VERSION=$DUPLICITY_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag duplicity:drone .
+  
 - name: publish
   environment:
-    DUPLICITY_VERSION: 0.8.23
+    CONTAINER_NAME: "duplicity"
+    CONTAINER_VERSION: "1.0.1"
     DOCKERIO_USERNAME:
       from_secret: username.docker.io
     DOCKERIO_PASSWORD:
       from_secret: password.docker.io
   commands:
-   - podman tag duplicity:build docker.io/gautada/duplicity:$DUPLICITY_VERSION
+   - podman tag $CONTAINER_NAME:drone docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:$CONTAINER_VERSION
+   - podman tag $CONTAINER_NAME:drone docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:latest
    - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
-   - podman push docker.io/gautada/duplicity:$DUPLICITY_VERSION
+   - podman push docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:$CONTAINER_VERSION
+   - podman push docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:latest
+
+
+trigger:
+  branch:
+  - main
