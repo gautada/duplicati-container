@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# Specify the directory you want to iterate over
+directory="/mnt/volumes/backup"
+
+# Use find to get a list of all directories in the specified directory
+# The -type d option ensures that only directories are selected
+for folder in $(find "$directory" -mindepth 1 -type d); do
+ FULLPATH=$folder
+ FOLDER=$(basename $FULLPATH)
+	echo "Processing folder: $FOLDER @ $FULLPATH"
+	ls -rt "$FULLPATH" | while read -r file; do
+		echo " --- Processing file: $file"
+		# Add your logic or commands for each file here
+	done
+done

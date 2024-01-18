@@ -6,24 +6,12 @@
 #             The default template is kept in
 #             [gist](https://gist.github.com/gautada/f185700af585a50b3884ad10c2b02f98)
 
-ENTRYPOINT_PARAMS="$@"
-. /etc/profile
 
-app_version() {
- echo "1"
+container_version() {
+ /usr/bin/duplicity --version | awk -F ' ' '{print $2}'
 }
-if [ -z "$@" ] ; then
-  log "-i" "entrypoint" "default"
-  /usr/bin/pgrep crond > /dev/null
-  TEST=$?
-  if [ $TEST -eq 0 ] ; then
-   /usr/bin/sudo /usr/bin/killall crond
-   log "-i" "entrypoint" "Blocking application - crond($(app_version))"
-   /usr/bin/sudo /usr/sbin/crond -f -l 0
-  fi
-  return 1
-else
- log "-i" "entrypoint" "Override default($ENTRYPOINT_PARAMS)"
- log "-i" "entrypoint" "Detatched application - duplicity($(app_version))"
- return 0
-fi
+
+container_entrypoint() {
+ /bin/echo "Blocking function until real mechanism is in place."
+ /usr/bin/tail -f /dev/null
+}

@@ -26,12 +26,12 @@ RUN /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
 # ╭―
 # │ PRIVILEGES
 # ╰――――――――――――――――――――
-COPY privileges /etc/container/privileges
+# COPY privileges /etc/container/privileges
 
 # ╭―
 # │ BACKUP
 # ╰――――――――――――――――――――
-COPY backup /etc/container/backup
+# COPY backup /etc/container/backup
 
 # ╭―
 # │ ENTRYPOINT
@@ -45,7 +45,8 @@ COPY entrypoint /etc/container/entrypoint
 ARG DUPLICITY_VERSION=2.1.4
 ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 
-COPY backup-synchronize-s3 /usr/bin/backup-synchronize-s3
+# COPY backup-synchronize-s3 /usr/bin/backup-synchronize-s3
+COPY duplicity-backup /usr/bin/duplicity-backup
 
 RUN /bin/ln -fsv /usr/bin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
 RUN /bin/ln -fsv /mnt/volumes/configmaps/duplicity.key /etc/container/duplicity.key
