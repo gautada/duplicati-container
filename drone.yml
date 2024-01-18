@@ -1,37 +1,61 @@
 kind: pipeline
 type: exec
-name: Container Build - Gitea
-
-
+name: CICD - Duplicity Container
 
 platform:
   os: linux
   arch: arm64
 
 steps:
+
 - name: build
-  environment:
-    ALPINE_VERSION: "latest"
-    DUPLICITY_VERSION: "1.0.1"
   commands:
-  - podman build --build-arg ALPINE_VERSION=$ALPINE_VERSION --build-arg DUPLICITY_VERSION=$DUPLICITY_VERSION --file Containerfile --format docker --label revision="$(git rev-parse HEAD)" --label version="$(date +%Y.%m.%d)" --no-cache --tag duplicity:drone .
+  - /usr/bin/podman-compose build --no-cache
+  - /usr/bin/podman images
   
-- name: publish
+- name: test
   environment:
-    CONTAINER_NAME: "duplicity"
-    CONTAINER_VERSION: "1.0.1"
     DOCKERIO_USERNAME:
       from_secret: username.docker.io
     DOCKERIO_PASSWORD:
       from_secret: password.docker.io
   commands:
-   - podman tag $CONTAINER_NAME:drone docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:$CONTAINER_VERSION
-   - podman tag $CONTAINER_NAME:drone docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:latest
-   - podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
-   - podman push docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:$CONTAINER_VERSION
-   - podman push docker.io/$DOCKERIO_USERNAME/$CONTAINER_NAME:latest
+  - echo "No tests are defined at this time."
+  - /usr/bin/podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
+  - /usr/bin/podman tag $DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):build docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):test
+  - /usr/bin/podman push docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):test
+  
+- name: integrate
+  environment:
+    DOCKERIO_USERNAME:
+      from_secret: username.docker.io
+    DOCKERIO_PASSWORD:
+      from_secret: password.docker.io
+  commands:
+  - /usr/bin/podman tag $(/usr/bin/compose-data --name):build docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):$(/usr/bin/compose-data --version)
+  - /usr/bin/podman tag $(/usr/bin/compose-data --name):build docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):latest
+  - /usr/bin/podman login --username=$DOCKERIO_USERNAME --password=$DOCKERIO_PASSWORD docker.io
+  - /usr/bin/podman push docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):latest
+  - /usr/bin/podman push docker.io/$DOCKERIO_USERNAME/$(/usr/bin/compose-data --name):$(/usr/bin/compose-data --version)
+  when:
+    branch:
+    - main
 
 
+- name: deploy
+  failure: ignore
+  environment:
+    DRONE_SERVER:
+      from_secret: server.drone.io
+    DRONE_TOKEN:
+      from_secret: token.drone.io
+  commands:
+  - echo "Deploy not defined"
+  when:
+    branch:
+    - main
+    
 trigger:
-  branch:
-  - main
+  event:
+  - push
+
