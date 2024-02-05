@@ -74,4 +74,5 @@ VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
 VOLUME /mnt/volumes/secrets
 VOLUME /mnt/volumes/source
+RUN chmod -R $USER:$USER /home/$USER
 WORKDIR /home/$USER
