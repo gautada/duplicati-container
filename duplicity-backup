@@ -1,2 +1,10 @@
 #!/bin/ash
 
+# This script synchronizes the source to target directories 
+# to provide a copy for the duplicity script to run to encrypt the backup 
+# and push to the backup to destination and offsite.
+ 
+/usr/bin/rsync --recursive --exclude 'duplicity' $HOME/source $HOME/local
+
+# duplicity full --encrypt-key <key-id> /var/backup file:///opt/backup
+PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity full --verbosity d --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --archive-dir /mnt/volumes/container /mnt/volumes/source file:///mnt/volumes/backup

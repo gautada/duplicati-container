@@ -44,13 +44,15 @@ ARG DUPLICITY_VERSION=2.1.4
 ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 
 RUN /bin/ln -svf /mnt/volumes/source /home/$USER/source
-RUN /bin/ln -svf /mnt/volumes/container /home/$USER/target
+RUN mkdir -p /home/$USER/local
+RUN /bin/ln -svf /mnt/volumes/container /home/$USER/cache
+RUN /bin/ln -svf /mnt/volumes/backup /home/$USER/target
 RUN /sbin/apk add --no-cache rsync \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
 
 
 # COPY backup-synchronize-s3 /usr/bin/backup-synchronize-s3
-# COPY duplicity-backup /usr/bin/duplicity-backup
+COPY duplicity-backup /usr/bin/duplicity-backup
 
 # RUN /bin/ln -fsv /usr/bin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
 # RUN /bin/ln -fsv /mnt/volumes/configmaps/duplicity.key /etc/container/duplicity.key
