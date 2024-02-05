@@ -11,44 +11,51 @@ container_version() {
  /usr/bin/duplicity --version | awk -F ' ' '{print $2}'
 }
 
-container_entrypoint() {
- if [ -z $DUPLICITY_ENCRYPTER_FINGERPRINT ] ; then
-  /bin/echo "Encrypter Fingerprint Not Found"
+gpg_key_importer() {
+ FINGERPRINT=$1
+ if [ -z $FINGERPRINT ] ; then
+  /bin/echo "Fingerprint[$FINGERPRINT] not found."
   return 1
  fi
- ENCRYPTER_KEY_FILE="/mnt/volumes/configmaps/$(/bin/echo $DUPLICITY_ENCRYPTER_FINGERPRINT).key"
- # /bin/echo $ENCRYPTER_PUBLIC_KEY
- if [ ! -f $ENCRYPTER_KEY_FILE ] ; then
-  /bin/echo "Encrypter public key not found"
+ 
+ FILE="/mnt/volumes/configmaps/$(/bin/echo $FINGERPRINT)"
+ KEY_FILE="$(/bin/echo $FILE).key"
+ PKEY_FILE="$(/bin/echo $FILE).pkey"
+
+ if [ ! -f $KEY_FILE ] ; then
+  /bin/echo "Public key file[$KEY_FILE] not found"
   return 2
  fi
- FILE_FINGERPRINT="$(/usr/bin/gpg --show-keys $ENCRYPTER_KEY_FILE | sed -n '2p' | xargs)"
- if [ "$DUPLICITY_ENCRYPTER_FINGERPRINT" != "$FILE_FINGERPRINT" ] ; then
-  /bin/echo "Configured fingerprint[$DUPLICITY_ENCRYPTER_FINGERPRINT] and provided file fingerprint[$FILE_FINGERPRINT] do not match"
+ 
+ if [ ! -f $PKEY_FILE ] ; then
+  /bin/echo "Private key file[$PKEY_FILE] not found"
   return 3
  fi
- /usr/bin/gpg --batch --trusted-key $DUPLICITY_ENCRYPTER_FINGERPRINT --import  $ENCRYPTER_KEY_FILE
- /bin/echo "trusted-key $DUPLICITY_ENCRYPTER_FINGERPRINT" >> $HOME/.gnupg/gpg.conf
-
- if [ -z $DUPLICITY_SIGNER_FINGERPRINT ] ; then
-  /bin/echo "Signer Fingerprint Not Found skipping signer key load"
- else
-  SIGNER_PKEY_FILE="/mnt/volumes/configmaps/$(/bin/echo $DUPLICITY_SIGNER_FINGERPRINT).pkey"
-  if [ ! -f $SIGNER_PKEY_FILE ] ; then
-   /bin/echo "Signer public key not found"
-   return 4
-  fi 
-  SIGNER_FILE_FINGERPRINT="$(/usr/bin/gpg --show-keys $SIGNER_PKEY_FILE | sed -n '2p' | xargs)"
-  if [ "$DUPLICITY_SIGNER_FINGERPRINT" != "$SIGNER_FILE_FINGERPRINT" ] ; then
-   /bin/echo "Configured fingerprint[$DUPLICITY_SIGNER_FINGERPRINT] and provided file fingerprint[$SIGNER_FILE_FINGERPRINT] do not match"
+ 
+ KEY_FP="$(/usr/bin/gpg --show-keys $KEY_FILE | sed -n '2p' | xargs)"
+ PKEY_FP="$(/usr/bin/gpg --show-keys $PKEY_FILE | sed -n '2p' | xargs)"
+ 
+ if [ "$FINGERPRINT" != "$KEY_FP" ] ; then
+  /bin/echo "Configured fingerprint[$FINGERPRINT] and provided file[$KEY_FILE] fingerprint[$KEY_FP] do not match"
+  return 4
+ fi
+ 
+ if [ "$FINGERPRINT" != "$PKEY_FP" ] ; then
+   /bin/echo "Configured fingerprint[$FINGERPRINT] and provided file[$PKEY_FILE] fingerprint[$PKEY_FP] do not match"
    return 5
   fi
-  /bin/echo $DUPLICITY_SIGNER_PASSPHRASE | /usr/bin/gpg --passphrase-fd 0 --batch --trusted-key $DUPLICITY_SIGNER_FINGERPRINT --import $SIGNER_PKEY_FILE
-  /bin/echo "trusted-key $DUPLICITY_SIGNER_FINGERPRINT" >> $HOME/.gnupg/gpg.conf
- fi
+  
+  /usr/bin/gpg --batch --trusted-key $DUPLICITY_ENCRYPTER_FINGERPRINT --import  $KEY_FILE $PKEY_FILE 
+}
 
+
+container_entrypoint() {
+ gpg_key_importer $DUPLICITY_ENCRYPTER_FINGERPRINT
+ gpg_key_importer $DUPLICITY_SIGNER_FINGERPRINT 
+   
  /usr/bin/gpg --list-keys
-    
- /bin/echo "Blocking function until real mechanism is in place."
+ /usr/bin/gpg --list-secret-keys
+  
+ /bin/echo "Blocking functione."
  /usr/bin/tail -f /dev/null
 }
