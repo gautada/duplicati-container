@@ -13,3 +13,5 @@ manifest/
 
 # .dockerignore can simply be a symlink
 .dockerignore
+
+.env

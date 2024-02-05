@@ -116,7 +116,7 @@ duplicity full --encrypt-key <id> --name daily --dry-run /var/backup file:///opt
 - This container originally was going to be implemented using [Duplicati](https://www.duplicati.com) that idea was dropped due to the difficulty in implementing mono from source.
 - The container uses the [distro pacakge for duplicity](https://pkgs.alpinelinux.org/packages?name=duplicity&branch=edge&repo=&arch=&maintainer=) use the package db for version.
 - 2024-02-02: References [Digital Ocean](https://www.digitalocean.com/community/tutorials/how-to-use-duplicity-with-gpg-to-securely-automate-backups-on-ubuntu) and [How to install and use Duplicity to Automate Backups](https://www.webhi.com/how-to/setup-use-duplicity-automatic-backups/)
-
+- 2024-02-05: FF
 
 
 
