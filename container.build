@@ -1,16 +1,13 @@
 ARG ALPINE_VERSION=latest
 
-# ╭―
-# │                                                                         │
-# │ STAGE: CONTAINER                                                     │
-# │                                                                         │
-# ╰―――――――――――――――――――――――――――――――――――――――――――――――
+# │ STAGE: CONTAINER
+# ╰――――――――――――――――――――――――――――――――――――――――――――――――――――――
 FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 
-# ╭―
-# │ METADATA           
+# ╭――――――――――――――――――――╮
+# │ METADATA           │
 # ╰――――――――――――――――――――╯
-LABEL source="https://github.com/gautada/duplicity-container.git"
+LABEL source="https://github.com/gautada/tandoor-container.git"
 LABEL maintainer="Adam Gautier <adam@gautier.org>"
 LABEL description="A container for backup service and system"
 
@@ -23,10 +20,11 @@ RUN /usr/sbin/usermod -d /home/$USER -m $USER
 RUN /usr/sbin/groupmod -n $USER alpine
 RUN /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
 
+
 # ╭―
 # │ PRIVILEGES
 # ╰――――――――――――――――――――
-# COPY privileges /etc/container/privileges
+COPY privileges /etc/container/privileges
 
 # ╭―
 # │ BACKUP
@@ -45,15 +43,21 @@ COPY entrypoint /etc/container/entrypoint
 ARG DUPLICITY_VERSION=2.1.4
 ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 
+RUN /bin/ln -svf /mnt/volumes/source /home/$USER/source
+RUN /bin/ln -svf /mnt/volumes/container /home/$USER/target
+RUN /sbin/apk add --no-cache rsync \
+ && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
+
+
 # COPY backup-synchronize-s3 /usr/bin/backup-synchronize-s3
-COPY duplicity-backup /usr/bin/duplicity-backup
+# COPY duplicity-backup /usr/bin/duplicity-backup
 
-RUN /bin/ln -fsv /usr/bin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
-RUN /bin/ln -fsv /mnt/volumes/configmaps/duplicity.key /etc/container/duplicity.key
-RUN /bin/ln -fsv /mnt/volumes/container/duplicity.key /mnt/volumes/configmaps/duplicity.key
-RUN /bin/ln -fsv /mnt/volumes/configmaps/synchronize.json /etc/container/synchronize.json
-RUN /bin/ln -fsv /mnt/volumes/container/synchronize.json /mnt/volumes/configmaps/synchronize.json
-
+# RUN /bin/ln -fsv /usr/bin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
+# RUN /bin/ln -fsv /mnt/volumes/configmaps/duplicity.key /etc/container/duplicity.key
+# RUN /bin/ln -fsv /mnt/volumes/container/duplicity.key /mnt/volumes/configmaps/duplicity.key
+# RUN /bin/ln -fsv /mnt/volumes/configmaps/synchronize.json /etc/container/synchronize.json
+# RUN /bin/ln -fsv /mnt/volumes/container/synchronize.json /mnt/volumes/configmaps/synchronize.json
+# 
 RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
 
@@ -67,4 +71,5 @@ VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
 VOLUME /mnt/volumes/secrets
+VOLUME /mnt/volumes/source
 WORKDIR /home/$USER

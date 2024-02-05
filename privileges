@@ -8,4 +8,5 @@
 # Enable only for debugging
 # %privileged ALL = (ALL) NOPASSWD: /usr/bin/apt-get
 
-%wheel         ALL = (ALL) NOPASSWD: /usr/sbin/backup-synchronize-s3
+# %wheel         ALL = (ALL) NOPASSWD: /usr/sbin/backup-synchronize-s3
+%privileged ALL = (ALL) NOPASSWD: /bin/mount
