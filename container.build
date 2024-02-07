@@ -51,20 +51,12 @@ RUN /sbin/apk add --no-cache rsync \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
 
 
-# COPY backup-synchronize-s3 /usr/bin/backup-synchronize-s3
 COPY duplicity-backup /usr/bin/duplicity-backup
+COPY duplicity-syncjob /usr/bin/duplicity-syncjob
+RUN ln -fsv /usr/bin/duplicity-syncjob /etc/periodic/daily
 
-# RUN /bin/ln -fsv /usr/bin/backup-synchronize-s3 /etc/periodic/15min/backup-synchronize-s3
-# RUN /bin/ln -fsv /mnt/volumes/configmaps/duplicity.key /etc/container/duplicity.key
-# RUN /bin/ln -fsv /mnt/volumes/container/duplicity.key /mnt/volumes/configmaps/duplicity.key
-# RUN /bin/ln -fsv /mnt/volumes/configmaps/synchronize.json /etc/container/synchronize.json
-# RUN /bin/ln -fsv /mnt/volumes/container/synchronize.json /mnt/volumes/configmaps/synchronize.json
-# 
 RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
-
-# RUN pip install --upgrade pip
-
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
@@ -76,5 +68,4 @@ VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
 VOLUME /mnt/volumes/secrets
 VOLUME /mnt/volumes/source
-
 WORKDIR /home/$USER

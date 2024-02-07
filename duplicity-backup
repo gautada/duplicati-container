@@ -7,6 +7,12 @@
 /usr/bin/rsync --recursive --exclude 'duplicity' $HOME/source/ $HOME/local
 
 # duplicity full --encrypt-key <key-id> /var/backup file:///opt/backup
-PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity full --verbosity d --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --archive-dir $HOME/cache $HOME/local file://$HOME/target
+TARGET_URL=file://$HOME/target
+
+/usr/bin/duplicity remove-older-than 1W --force
+ 
+PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity --verbosity d --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --archive-dir $HOME/cache $HOME/local $TARGET_URL
+
+echo $?
 
 # date +%u
