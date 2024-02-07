@@ -1,21 +1,39 @@
 #!/bin/ash
 
-# This script synchronizes the source to target directories 
-# to provide a copy for the duplicity script to run to encrypt the backup 
-# and push to the backup to destination and offsite.
+# This script synchronizes the source to a local directory and then 
+# runs duplicity to run an intelligent backup that should sync encrypted
+# and signed copy of the backups to the target
  
-/usr/bin/rsync --exclude 'duplicity' --recursive --verbose $HOME/source/ $HOME/local
+if [ -z $DUPLICITY_TARGET_URL ] ; then
+ $DUPLICITY_TARGET_URL=file://$HOME/target
+fi
 
-# duplicity full --encrypt-key <key-id> /var/backup file:///opt/backup
-TARGET_URL=file://$HOME/target
+full_clean() {
+ /bin/rm -rf $HOME/cache/* $HOME/local/* $HOME/target/*
+}
+
+sync_local() {
+ /usr/bin/rsync --exclude 'duplicity' --recursive --verbose $HOME/source/ $HOME/local
+}
+
+weekly_rotate() {
+ PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD duplicity cleanup --force file://$HOME/target
+ /usr/bin/duplicity remove-older-than 1W --force
+ PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity full --archive-dir $HOME/cache --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --verbosity d $HOME/local $DUPLICITY_TARGET_URL
+}
 
 SUNDAY="0"
 DAY_OF_WEEK="$(/bin/date +%u)"
 if [ $DAY_OF_WEEK == $SUNDAY ] ; then
- PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD duplicity cleanup --force file://$HOME/target
- /usr/bin/duplicity remove-older-than 1W --force
- PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity full --archive-dir $HOME/cache --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --verbosity d $HOME/local $TARGET_URL
+ sync_local
+ weekly_rotate
 else
- PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity --archive-dir $HOME/cache --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --verbosity d $HOME/local $TARGET_URL
- echo "COMPLETE SIGNAL $?"
+ sync_local 
+ PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity --archive-dir $HOME/cache --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --verbosity d $HOME/local $DUPLICITY_TARGET_URL
+ RESULT=$?
+ if [ $RESULT -ne 0 ] ; then
+  full_clean
+  sync_local
+  weekly_rotate 
+ fi
 fi
