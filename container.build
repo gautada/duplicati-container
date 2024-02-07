@@ -29,7 +29,9 @@ COPY privileges /etc/container/privileges
 # ╭―
 # │ BACKUP
 # ╰――――――――――――――――――――
+# No backup needed and even disable the automated hourly backup
 # COPY backup /etc/container/backup
+RUN rm -f /etc/periodic/hourly/container-backup
 
 # ╭―
 # │ ENTRYPOINT
