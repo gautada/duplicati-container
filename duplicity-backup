@@ -5,11 +5,13 @@
 # and signed copy of the backups to the target
  
 if [ -z $DUPLICITY_TARGET_URL ] ; then
- $DUPLICITY_TARGET_URL=file://$HOME/target
+ DUPLICITY_TARGET_URL=file://$HOME/target
 fi
 
 full_clean() {
- /bin/rm -rf $HOME/cache/* $HOME/local/* $HOME/target/*
+ PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD duplicity cleanup --force $$DUPLICITY_TARGET_URL	
+ /bin/rm -rf $HOME/cache/* $HOME/local/*
+ 
 }
 
 sync_local() {
@@ -17,15 +19,15 @@ sync_local() {
 }
 
 weekly_rotate() {
- PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD duplicity cleanup --force file://$HOME/target
- /usr/bin/duplicity remove-older-than 1W --force
+ PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD /usr/bin/duplicity remove-older-than 3m --force $DUPLICITY_TARGET_URL
  PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD /usr/bin/duplicity full --archive-dir $HOME/cache --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT --sign-key $DUPLICITY_SIGNER_FINGERPRINT --verbosity d $HOME/local $DUPLICITY_TARGET_URL
 }
 
 SUNDAY="0"
 DAY_OF_WEEK="$(/bin/date +%u)"
-if [ $DAY_OF_WEEK == $SUNDAY ] ; then
- sync_local
+
+sync_local
+if [ $DAY_OF_WEEK == $SUNDAY ] ; then 
  weekly_rotate
 else
  sync_local 
@@ -37,3 +39,5 @@ else
   weekly_rotate 
  fi
 fi
+
+
