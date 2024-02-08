@@ -1,6 +1,6 @@
 kind: pipeline
 type: exec
-name: CICD - Duplicity Container
+name: Utility - Duplicity Container
 
 platform:
   os: linux
