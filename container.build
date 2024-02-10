@@ -45,13 +45,8 @@ COPY entrypoint /etc/container/entrypoint
 ARG DUPLICITY_VERSION=2.1.4
 ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 
-RUN /bin/ln -svf /mnt/volumes/source /home/$USER/source
-RUN mkdir -p /home/$USER/local
-RUN /bin/ln -svf /mnt/volumes/container /home/$USER/cache
-RUN /bin/ln -svf /mnt/volumes/backup /home/$USER/target
 RUN /sbin/apk add --no-cache rsync \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
-
 
 COPY duplicity-backup /usr/bin/duplicity-backup
 COPY duplicity-syncjob /usr/bin/duplicity-syncjob
@@ -63,8 +58,13 @@ RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-RUN /bin/chown -R $USER:$USER /home/$USER
+
 USER $USER
+RUN /bin/ln -svf /mnt/volumes/source /home/$USER/source
+RUN mkdir -p /home/$USER/local
+RUN /bin/ln -svf /mnt/volumes/container /home/$USER/cache
+RUN /bin/ln -svf /mnt/volumes/backup /home/$USER/target
+
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
