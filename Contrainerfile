@@ -9,7 +9,7 @@ FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 # ╰――――――――――――――――――――╯
 LABEL source="https://github.com/gautada/tandoor-container.git"
 LABEL maintainer="Adam Gautier <adam@gautier.org>"
-LABEL description="A container for backup service and system"
+LABEL description="A container for offsite backup client service"
 
 # ╭―
 # │ USER
@@ -38,7 +38,6 @@ RUN rm -f /etc/periodic/hourly/container-backup
 # ╰――――――――――――――――――――
 COPY entrypoint /etc/container/entrypoint
 
-
 # ╭――――――――――――――――――――╮
 # │ APPLICATION        │
 # ╰――――――――――――――――――――╯
@@ -58,13 +57,8 @@ RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
-
+RUN /bin/chown -R $USER:$USER /home/$USER
 USER $USER
-RUN /bin/ln -svf /mnt/volumes/source /home/$USER/source
-RUN mkdir -p /home/$USER/local
-RUN /bin/ln -svf /mnt/volumes/container /home/$USER/cache
-RUN /bin/ln -svf /mnt/volumes/backup /home/$USER/target
-
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps
 VOLUME /mnt/volumes/container
