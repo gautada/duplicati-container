@@ -1,8 +1,34 @@
 # duplicity
 
-[Duplicity](https://duplicity.gitlab.io) backs directories by producing encrypted tar-format volumes and uploading them to a remote or local file server. Because duplicity uses librsync, the incremental archives are space efficient and only record the parts of files that have changed since the last backup. Because duplicity uses GnuPG to encrypt and/or sign these archives, they will be safe from spying and/or modification by the server.
+[Duplicity](https://duplicity.gitlab.io) backs directories by producing encrypted tar-format volumes and uploading them 
+to a remote or local file server. Because duplicity uses librsync, the incremental archives are space efficient and only 
+record the parts of files that have changed since the last backup. Because duplicity uses GnuPG to encrypt and/or sign 
+these archives, they will be safe from spying and/or modification by the server.
+
+https://gock.net/blog/2020/gpg-cheat-sheet
+
+https://easyengine.io/tutorials/backups/duplicity-amazon-s3/
+
+## Commands
+
+List keys
+```
+/usr/bin/gpg --list-keys
+```
+
+
 
 ## Setup
+
+### AWS Setup
+
+Create an S3 Bucket to hold duplicity archives. Because bucket names must be unique globally a FQDN like `duplicity.fqdn.tld` 
+should probably be used. Next create an IAM user for CLI access and make sure the user has the permissions 
+`arn:aws:iam::aws:policy/AmazonS3FullAccess` either directly or through a user group.
+
+Check that credentials are available through credentials file or environment variables - Check login using boto3. `aws_test.py`
+
+
 
 The duplicity container is designed to push the backup files outside of the local environment and therefore must be both encrypted and signed in order to guarantee data security. Two password protected public-private key sets must be generated using `gpg` in development (or independently) then provided to the production environment.
 
