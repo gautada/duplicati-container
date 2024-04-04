@@ -57,6 +57,7 @@ RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
+COPY aws_test.py /home/$USER/aws_test.py
 RUN /bin/chown -R $USER:$USER /home/$USER
 USER $USER
 VOLUME /mnt/volumes/backup
