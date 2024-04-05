@@ -24,6 +24,6 @@ if CONTENTS in response:
 	print("Backup Cleanup:")
 	for object in response[CONTENTS]:
 		if object['Key'] != PREFIX:
-		print(' - Deleting', object['Key'])
-		s3_client.delete_object(Bucket=BUCKET, Key=object['Key'])
+			print(' - Deleting', object['Key'])
+			s3_client.delete_object(Bucket=BUCKET, Key=object['Key'])
 
