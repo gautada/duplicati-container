@@ -54,15 +54,13 @@ RUN ln -fsv /usr/bin/duplicity-syncjob /etc/periodic/daily
 RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
 
-COPY backup-clenup /usr/bin/backup-cleanup
+COPY backup-cleanup /usr/bin/backup-cleanup
 COPY backup-remotes3 /usr/bin/backup-remotes3
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
 # ╰――――――――――――――――――――╯
 COPY aws_test.py /home/$USER/aws_test.py
-COPY aws_backup.sh /home/$USER/aws_backup.sh
-RUN chmod +x /home/$USER/aws_backup.sh
 RUN /bin/chown -R $USER:$USER /home/$USER
 USER $USER
 VOLUME /mnt/volumes/backup
