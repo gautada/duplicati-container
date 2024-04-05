@@ -1,12 +1,6 @@
 #!/bin/sh
-
-# echo "$AWS_ACCESS_KEY"
-# echo "$AWS_SECRET_ACCESS_KEY"
-
 export PASSPHRASE=$DUPLICITY_ENCRYPTER_PASSWORD
 export SIGN_PASSPHRASE=$DUPLICITY_SIGNER_PASSWORD
-
-OLDER_THAN="1h"
 
 MONTH_NUM="$(/bin/date +%m)"
 MONTH_NAME="$(date +%b)"
@@ -17,9 +11,9 @@ echo "$DESTINATION"
 
 # is_running=$(ps -ef | grep duplicity  | grep python | wc -l)
 
-
-/usr/bin/duplicity remove-older-than ${OLDER_THAN} ${DESTINATION}
-#  >> ${DAILYLOGFILE} 2>&1
+python /usr/bin/backup-cleanup
+# OLDER_THAN="1h"
+# /usr/bin/duplicity remove-older-than ${OLDER_THAN} ${DESTINATION}
 
 /usr/bin/duplicity \
  --archive-dir $HOME/tmp \

@@ -47,12 +47,15 @@ ARG DUPLICITY_PACKAGE="$DUPLICITY_VERSION"-r0
 RUN /sbin/apk add --no-cache rsync \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
 
-COPY duplicity-backup /usr/bin/duplicity-backup
-COPY duplicity-syncjob /usr/bin/duplicity-syncjob
+# COPY duplicity-backup /usr/bin/duplicity-backup
+# COPY duplicity-syncjob /usr/bin/duplicity-syncjob
 RUN ln -fsv /usr/bin/duplicity-syncjob /etc/periodic/daily
 
 RUN /sbin/apk add --no-cache rsync python3 py3-pip py3-boto3 \
  && /sbin/apk add --no-cache --repository http://dl-cdn.alpinelinux.org/alpine/latest-stable/community/ duplicity=$DUPLICITY_PACKAGE
+
+COPY backup-clenup /usr/bin/backup-cleanup
+COPY backup-remotes3 /usr/bin/backup-remotes3
 
 # ╭――――――――――――――――――――╮
 # │ CONTAINER          │
