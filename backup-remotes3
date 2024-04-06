@@ -16,7 +16,7 @@ python /usr/bin/backup-cleanup
 # /usr/bin/duplicity remove-older-than ${OLDER_THAN} ${DESTINATION}
 
 /usr/bin/duplicity \
- --archive-dir $HOME/tmp \
+ --archive-dir /mnt/volumes/container \
  --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT \
  --sign-key $DUPLICITY_SIGNER_FINGERPRINT \
- --verbosity d $HOME/test $DESTINATION
+ --verbosity d /mnt/volumes/sources $DESTINATION
