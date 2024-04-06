@@ -19,4 +19,4 @@ python /usr/bin/backup-cleanup
  --archive-dir /mnt/volumes/container \
  --encrypt-key $DUPLICITY_ENCRYPTER_FINGERPRINT \
  --sign-key $DUPLICITY_SIGNER_FINGERPRINT \
- --verbosity d /mnt/volumes/sources $DESTINATION
+ --verbosity d /mnt/volumes/source $DESTINATION
